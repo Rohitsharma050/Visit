@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-black text-gray-900 dark:text-gray-100 font-sans;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 focus:ring-gray-500 border border-black dark:border-white;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-800 dark:bg-gray-200 text-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-300 focus:ring-gray-500 border border-gray-800 dark:border-gray-200;
+  }
+
+  .btn-outline {
+    @apply border-2 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-900 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 focus:ring-gray-500 border-2 border-black dark:border-white;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-black text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all;
+  }
+
+  .card {
+    @apply bg-white dark:bg-black rounded-xl shadow-lg p-6 border-2 border-gray-200 dark:border-gray-800 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:shadow-2xl hover:scale-[1.02] hover:border-gray-900 dark:hover:border-gray-100;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border-2;
+  }
+
+  .badge-easy {
+    @apply bg-white dark:bg-black text-gray-900 dark:text-gray-100 border-gray-400 dark:border-gray-600;
+  }
+
+  .badge-medium {
+    @apply bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-500 dark:border-gray-500;
+  }
+
+  .badge-hard {
+    @apply bg-black dark:bg-white text-white dark:text-black border-black dark:border-white;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 mr-1 mb-1;
+  }
+}
+
+/* React Quill Editor Styles */
+.ql-container {
+  @apply border-gray-300 dark:border-gray-600 rounded-b-lg;
+}
+
+.ql-toolbar {
+  @apply border-gray-300 dark:border-gray-600 rounded-t-lg bg-gray-50 dark:bg-gray-900;
+}
+
+.ql-editor {
+  @apply min-h-[200px] text-gray-900 dark:text-gray-100 bg-white dark:bg-black;
+}
+
+.ql-snow .ql-stroke {
+  @apply stroke-gray-600 dark:stroke-gray-300;
+}
+
+.ql-snow .ql-fill {
+  @apply fill-gray-600 dark:fill-gray-300;
+}
+
+.ql-snow .ql-picker-label {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* Loading Animation */
+.spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #000;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.dark .spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #fff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Landing Page Specific Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Oversized Typography for Landing */
+.landing-hero-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Magnetic Button Effect */
+@keyframes magnetic-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.magnetic-button:hover {
+  animation: magnetic-pulse 2s ease-in-out infinite;
+}
+
+/* Cursor Glow */
+.cursor-glow {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  mix-blend-mode: difference;
+  z-index: 9999;
+  transition: transform 0.2s ease;
+}
+
+/* Hide scrollbar for horizontal scroll sections */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
