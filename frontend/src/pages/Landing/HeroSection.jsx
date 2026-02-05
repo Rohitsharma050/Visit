@@ -146,7 +146,7 @@ const HeroSection = () => {
           transition={{ duration: 1, delay: 0.2 }}
         >
           {/* Main Headline - Oversized Typography */}
-          <h1 className="text-[8rem] md:text-[12rem] lg:text-[16rem] font-black leading-none tracking-tighter text-white mb-8">
+          <h1 className="text-[6rem] md:text-[8rem] lg:text-[10rem] font-black leading-none tracking-tighter text-white mb-8">
             Your
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-white">
