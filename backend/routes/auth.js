@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import User from '../models/User.js';
-import { generateToken } from '../middleware/auth.js';
+import { generateToken, protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -125,6 +125,31 @@ router.post('/login', [
     res.status(500).json({
       success: false,
       message: 'Error logging in',
+      error: error.message
+    });
+  }
+});
+
+// @route   GET /api/auth/me
+// @desc    Get current logged in user
+// @access  Private
+router.get('/me', protect, async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          id: req.user._id,
+          name: req.user.name,
+          email: req.user.email
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user',
       error: error.message
     });
   }
