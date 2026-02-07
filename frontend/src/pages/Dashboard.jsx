@@ -89,7 +89,7 @@ const Dashboard = () => {
             className="btn btn-primary flex items-center space-x-2"
           >
             <FiPlus className="w-5 h-5" />
-            <span>New Subject</span>
+            <span className="hidden sm:inline">New Subject</span>
           </button>
         </div>
 

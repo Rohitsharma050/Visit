@@ -173,13 +173,13 @@ const QuestionEdit = () => {
                     onClick={() => setFormData({ ...formData, difficulty: level })}
                     className={`p-3 rounded-lg border-2 transition-all ${
                       formData.difficulty === level
-                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-primary-300'
+                        ? 'border-gray-900 dark:border-white bg-gray-100 dark:bg-gray-800'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-500 dark:hover:border-gray-400'
                     }`}
                   >
                     <span className={`font-medium ${
                       formData.difficulty === level
-                        ? 'text-primary-700 dark:text-primary-300'
+                        ? 'text-gray-900 dark:text-white'
                         : 'text-gray-700 dark:text-gray-300'
                     }`}>
                       {level}

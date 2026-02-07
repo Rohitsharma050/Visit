@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FiArrowLeft, FiEdit, FiTrash2, FiCalendar } from 'react-icons/fi';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import RichTextDisplay from '../components/RichTextDisplay';
 
 const QuestionView = () => {
   const { id } = useParams();
@@ -130,14 +131,14 @@ const QuestionView = () => {
                 className="btn btn-outline flex items-center space-x-2"
               >
                 <FiEdit className="w-4 h-4" />
-                <span>Edit</span>
+                <span className="hidden sm:inline">Edit</span>
               </Link>
               <button
                 onClick={handleDelete}
                 className="btn btn-danger flex items-center space-x-2"
               >
                 <FiTrash2 className="w-4 h-4" />
-                <span>Delete</span>
+                <span className="hidden sm:inline">Delete</span>
               </button>
             </div>
           </div>
@@ -163,16 +164,7 @@ const QuestionView = () => {
             <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
               Answer
             </h3>
-            <div 
-              className="prose prose-lg dark:prose-invert max-w-none
-                         prose-headings:text-gray-800 dark:prose-headings:text-gray-100
-                         prose-p:text-gray-700 dark:prose-p:text-gray-300
-                         prose-strong:text-gray-900 dark:prose-strong:text-gray-100
-                         prose-code:text-primary-600 dark:prose-code:text-primary-400
-                         prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800
-                         prose-a:text-primary-600 dark:prose-a:text-primary-400"
-              dangerouslySetInnerHTML={{ __html: question.answer }}
-            />
+            <RichTextDisplay content={question.answer} />
           </div>
 
           {/* Metadata Footer */}

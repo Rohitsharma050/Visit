@@ -62,25 +62,21 @@ const CTAFooter = () => {
             </div>
 
             {/* Links */}
-            <div className="flex items-center space-x-8">
+            <div className="flex lg:pl-20 justify-center items-center space-x-6">
+             
+              
               <Link
-                to="/login"
+                to="/terms"
                 className="text-gray-400 hover:text-white transition-colors text-sm"
               >
-                Login
+                Terms
               </Link>
               <Link
-                to="/signup"
+                to="/privacy"
                 className="text-gray-400 hover:text-white transition-colors text-sm"
               >
-                Sign Up
+                Privacy
               </Link>
-              <a
-                href="#product"
-                className="text-gray-400 hover:text-white transition-colors text-sm"
-              >
-                Product
-              </a>
             </div>
 
             {/* Copyright */}

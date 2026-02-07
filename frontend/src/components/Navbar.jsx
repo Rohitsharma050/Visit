@@ -44,20 +44,21 @@ const Navbar = () => {
             {/* User Info */}
             {user && (
               <>
-                <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-700">
+                {/* Hidden on mobile, visible on md and up */}
+                <div className="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-700">
                   <FiUser className="w-4 h-4 text-gray-900 dark:text-gray-100" />
                   <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {user.name}
                   </span>
                 </div>
 
-                {/* Logout Button */}
+                {/* Logout Button - Icon only on mobile */}
                 <button
                   onClick={logout}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white dark:bg-black text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors border-2 border-black dark:border-white"
+                  className="flex items-center space-x-2 px-3 md:px-4 py-2 rounded-lg bg-white dark:bg-black text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors border-2 border-black dark:border-white"
                 >
                   <FiLogOut className="w-4 h-4" />
-                  <span className="text-sm font-medium">Logout</span>
+                  <span className="hidden md:inline text-sm font-medium">Logout</span>
                 </button>
               </>
             )}

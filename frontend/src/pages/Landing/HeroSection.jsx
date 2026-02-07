@@ -139,18 +139,19 @@ const HeroSection = () => {
       />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-4 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
           {/* Main Headline - Oversized Typography */}
-          <h1 className="text-[6rem] md:text-[8rem] lg:text-[10rem] font-black leading-none tracking-tighter text-white mb-8">
-            Your
+          <h1 className="text-[4rem] md:text-[6rem] lg:text-[8rem] font-black leading-none tracking-tighter text-white mb-8">
+            Your Knowledge
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-white">
-              Knowledge
+            <span className="text-transparent bg-clip-text text-neutral-400
+             bg-gradient-to-r from-white via-gray-300 to-white">
+              Your Notes
             </span>
           </h1>
 

@@ -8,6 +8,11 @@ import SubjectDetail from './pages/SubjectDetail';
 import QuestionEdit from './pages/QuestionEdit';
 import QuestionView from './pages/QuestionView';
 import Landing from './pages/Landing/Landing';
+import GuidePage from './pages/Landing/GuidePage';
+import PricingPage from './pages/Landing/PricingPage';
+import SupportPage from './pages/Landing/SupportPage';
+import TermsPage from './pages/Landing/TermsPage';
+import PrivacyPage from './pages/Landing/PrivacyPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -36,7 +41,7 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  return !isAuthenticated ? children : <Navigate to="/" replace />;
+  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
 function App() {
@@ -46,7 +51,14 @@ function App() {
         <AuthProvider>
           <Routes>
             {/* Landing Page */}
-            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Landing />} />
+            
+            {/* Landing Support Pages */}
+            <Route path="/guide" element={<GuidePage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/support" element={<SupportPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
 
             {/* Public Routes */}
             <Route
@@ -68,7 +80,7 @@ function App() {
 
             {/* Protected Routes */}
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -109,7 +121,7 @@ function App() {
             />
 
             {/* 404 Route */}
-            <Route path="*" element={<Navigate to="/landing" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>

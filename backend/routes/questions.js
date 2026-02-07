@@ -15,7 +15,7 @@ router.use(protect);
 router.post('/', [
   body('subjectId').notEmpty().withMessage('Subject ID is required'),
   body('title').trim().notEmpty().withMessage('Question title is required'),
-  body('answer').trim().notEmpty().withMessage('Answer is required'),
+  body('answer').notEmpty().withMessage('Answer is required'),
   body('difficulty').isIn(['Easy', 'Medium', 'Hard']).withMessage('Invalid difficulty level')
 ], async (req, res) => {
   try {
@@ -171,7 +171,7 @@ router.get('/:id', async (req, res) => {
 // @access  Private
 router.put('/:id', [
   body('title').optional().trim().notEmpty().withMessage('Title cannot be empty'),
-  body('answer').optional().trim().notEmpty().withMessage('Answer cannot be empty'),
+  body('answer').optional().notEmpty().withMessage('Answer cannot be empty'),
   body('difficulty').optional().isIn(['Easy', 'Medium', 'Hard']).withMessage('Invalid difficulty level')
 ], async (req, res) => {
   try {

@@ -27,7 +27,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/landing" className="flex items-center space-x-3 group">
+          <Link to="/" className="flex items-center space-x-3 group">
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="w-10 h-10 bg-white rounded-lg flex items-center justify-center"
@@ -41,24 +41,30 @@ const Navbar = () => {
 
           {/* Center Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#product"
+            <Link
+              to="/"
               className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
             >
-              Product
-            </a>
-            <a
-              href="#features"
+              Home
+            </Link>
+            <Link
+              to="/guide"
               className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
             >
-              Features
-            </a>
-            <a
-              href="#philosophy"
+              Guide
+            </Link>
+            <Link
+              to="/pricing"
               className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
             >
-              About
-            </a>
+              Pricing
+            </Link>
+            <Link
+              to="/support"
+              className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+            >
+              Support
+            </Link>
           </div>
 
           {/* Right Actions */}

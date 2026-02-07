@@ -109,7 +109,7 @@ const SubjectDetail = () => {
           <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">
             Subject not found
           </h2>
-          <Link to="/" className="btn btn-primary mt-4">
+          <Link to="/dashboard" className="btn btn-primary mt-4">
             Back to Dashboard
           </Link>
         </div>
@@ -124,7 +124,7 @@ const SubjectDetail = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-4">
+          <Link to="/dashboard" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-4">
             <FiArrowLeft className="w-4 h-4 mr-2" />
             Back to Subjects
           </Link>
@@ -148,7 +148,7 @@ const SubjectDetail = () => {
                   className="btn btn-outline flex items-center space-x-2"
                 >
                   <FiDownload className="w-5 h-5" />
-                  <span>Export PDF</span>
+                  <span className="hidden sm:inline">Export PDF</span>
                 </button>
               )}
               <Link
@@ -156,7 +156,7 @@ const SubjectDetail = () => {
                 className="btn btn-primary flex items-center space-x-2"
               >
                 <FiPlus className="w-5 h-5" />
-                <span>Add Question</span>
+                <span className="hidden sm:inline">Add Question</span>
               </Link>
             </div>
           </div>
