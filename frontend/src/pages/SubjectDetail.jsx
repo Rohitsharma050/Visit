@@ -9,6 +9,8 @@ import QuestionCard from '../components/QuestionCard';
 import SearchBar from '../components/SearchBar';
 import FilterPanel from '../components/FilterPanel';
 import StatsCard from '../components/StatsCard';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 const SubjectDetail = () => {
   const { id } = useParams();
@@ -20,6 +22,8 @@ const SubjectDetail = () => {
   const [difficulty, setDifficulty] = useState('all');
   const [selectedTag, setSelectedTag] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   useEffect(() => {
     fetchSubjectAndQuestions();
@@ -71,16 +75,23 @@ const SubjectDetail = () => {
   };
 
   const handleDeleteQuestion = async (questionId) => {
-    if (!confirm('Are you sure you want to delete this question?')) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: 'Delete Question?',
+      message: 'This will permanently delete this question. This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
 
     try {
       await api.delete(`/questions/${questionId}`);
+      toast.success('Question deleted successfully');
       fetchSubjectAndQuestions();
     } catch (error) {
       console.error('Error deleting question:', error);
-      alert(error.response?.data?.message || 'Error deleting question');
+      toast.error(error.response?.data?.message || 'Error deleting question');
     }
   };
 

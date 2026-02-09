@@ -3,69 +3,6 @@ import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-/**
- * @route   GET /api/ai/test
- * @desc    Test Gemini API connection
- * @access  Public (for debugging)
- */
-router.get('/test', async (req, res) => {
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      return res.status(400).json({
-        success: false,
-        message: 'GEMINI_API_KEY not found in environment variables',
-        fix: 'Add GEMINI_API_KEY=your_key to backend/.env file'
-      });
-    }
-
-    // Test the API key by listing models
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
-    );
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return res.status(400).json({
-        success: false,
-        message: 'API key validation failed',
-        error: error.error?.message || `HTTP ${response.status}`,
-        fix: 'Check if your API key is valid at https://aistudio.google.com/app/apikey'
-      });
-    }
-
-    const data = await response.json();
-    const models = data.models?.map(m => m.name.replace('models/', '')) || [];
-    
-    // Find generateContent capable models
-    const generateModels = data.models?.filter(m => 
-      m.supportedGenerationMethods?.includes('generateContent')
-    ).map(m => m.name.replace('models/', '')) || [];
-
-    res.json({
-      success: true,
-      message: 'Gemini API connection successful!',
-      apiKeyPrefix: apiKey.substring(0, 10) + '...',
-      totalModels: models.length,
-      generateContentModels: generateModels,
-      recommendedModel: generateModels[0] || 'No models available'
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Connection error',
-      error: error.message
-    });
-  }
-});
-
-/**
- * @route   GET /api/ai/models
- * @desc    List available Gemini models
- * @access  Public
- */
 router.get('/models', async (req, res) => {
   try {
     const apiKey = process.env.GEMINI_API_KEY;

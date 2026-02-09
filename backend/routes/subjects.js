@@ -52,23 +52,34 @@ router.post('/', [
 // @access  Private
 router.get('/', async (req, res) => {
   try {
-    const subjects = await Subject.find({ createdBy: req.user._id })
-      .sort({ createdAt: -1 });
-
-    // Get question count for each subject
-    const subjectsWithStats = await Promise.all(
-      subjects.map(async (subject) => {
-        const questionCount = await Question.countDocuments({ subjectId: subject._id });
-        return {
-          ...subject.toObject(),
-          questionCount
-        };
-      })
-    );
+    // Optimized: Use aggregation to get subjects with question counts in single query
+    const subjectsWithStats = await Subject.aggregate([
+      { $match: { createdBy: req.user._id } },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: 'questions',
+          localField: '_id',
+          foreignField: 'subjectId',
+          as: 'questions'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          createdBy: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          questionCount: { $size: '$questions' }
+        }
+      }
+    ]);
 
     res.status(200).json({
       success: true,
-      count: subjects.length,
+      count: subjectsWithStats.length,
       data: subjectsWithStats
     });
   } catch (error) {
@@ -86,7 +97,7 @@ router.get('/', async (req, res) => {
 // @access  Private
 router.get('/:id', async (req, res) => {
   try {
-    const subject = await Subject.findById(req.params.id);
+    const subject = await Subject.findById(req.params.id).lean();
 
     if (!subject) {
       return res.status(404).json({
@@ -103,27 +114,46 @@ router.get('/:id', async (req, res) => {
       });
     }
 
-    // Get statistics
-    const totalQuestions = await Question.countDocuments({ subjectId: subject._id });
-    const easyCount = await Question.countDocuments({ subjectId: subject._id, difficulty: 'Easy' });
-    const mediumCount = await Question.countDocuments({ subjectId: subject._id, difficulty: 'Medium' });
-    const hardCount = await Question.countDocuments({ subjectId: subject._id, difficulty: 'Hard' });
+    // Optimized: Single aggregation query for all stats
+    const [stats] = await Question.aggregate([
+      { $match: { subjectId: subject._id } },
+      {
+        $facet: {
+          counts: [
+            {
+              $group: {
+                _id: '$difficulty',
+                count: { $sum: 1 }
+              }
+            }
+          ],
+          tags: [
+            { $unwind: { path: '$tags', preserveNullAndEmptyArrays: false } },
+            { $group: { _id: '$tags' } }
+          ],
+          total: [{ $count: 'count' }]
+        }
+      }
+    ]);
 
-    // Get all unique tags
-    const questions = await Question.find({ subjectId: subject._id }).select('tags');
-    const allTags = [...new Set(questions.flatMap(q => q.tags))];
+    // Process aggregation results
+    const difficultyCounts = { easy: 0, medium: 0, hard: 0 };
+    stats.counts.forEach(item => {
+      if (item._id === 'Easy') difficultyCounts.easy = item.count;
+      else if (item._id === 'Medium') difficultyCounts.medium = item.count;
+      else if (item._id === 'Hard') difficultyCounts.hard = item.count;
+    });
+
+    const allTags = stats.tags.map(t => t._id);
+    const totalQuestions = stats.total[0]?.count || 0;
 
     res.status(200).json({
       success: true,
       data: {
-        ...subject.toObject(),
+        ...subject,
         stats: {
           totalQuestions,
-          difficulty: {
-            easy: easyCount,
-            medium: mediumCount,
-            hard: hardCount
-          },
+          difficulty: difficultyCounts,
           tags: allTags
         }
       }

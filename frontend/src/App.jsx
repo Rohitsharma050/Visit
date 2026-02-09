@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -13,6 +15,7 @@ import PricingPage from './pages/Landing/PricingPage';
 import SupportPage from './pages/Landing/SupportPage';
 import TermsPage from './pages/Landing/TermsPage';
 import PrivacyPage from './pages/Landing/PrivacyPage';
+import StatsPage from './pages/StatsPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -48,7 +51,9 @@ function App() {
   return (
     <Router>
       <ThemeProvider>
-        <AuthProvider>
+        <ToastProvider>
+          <ConfirmProvider>
+            <AuthProvider>
           <Routes>
             {/* Landing Page */}
             <Route path="/" element={<Landing />} />
@@ -59,6 +64,7 @@ function App() {
             <Route path="/support" element={<SupportPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/stats" element={<StatsPage />} />
 
             {/* Public Routes */}
             <Route
@@ -123,7 +129,9 @@ function App() {
             {/* 404 Route */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </AuthProvider>
+          </AuthProvider>
+          </ConfirmProvider>
+        </ToastProvider>
       </ThemeProvider>
     </Router>
   );

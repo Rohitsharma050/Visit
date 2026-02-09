@@ -207,45 +207,37 @@ router.post('/google', [
       });
     }
 
-    // Check if user exists by googleId
-    let user = await User.findOne({ googleId });
-
-    if (!user) {
-      // Check if user exists by email (might have signed up with email/password before)
-      user = await User.findOne({ email });
-
-      if (user) {
-        // Link Google account to existing user
-        user.googleId = googleId;
-        user.profilePicture = profilePicture || user.profilePicture;
-        if (user.authProvider === 'local') {
-          // Keep as local since they originally signed up with email
-        }
-        await user.save();
-      } else {
-        // Create new user
-        user = await User.create({
+    // Optimized: Single query using findOneAndUpdate with upsert
+    // First try to find by googleId, then by email
+    let user = await User.findOneAndUpdate(
+      { $or: [{ googleId }, { email }] },
+      {
+        $setOnInsert: {
           name,
           email,
+          authProvider: 'google',
+          createdAt: new Date()
+        },
+        $set: {
           googleId,
-          profilePicture,
-          authProvider: 'google'
-        });
+          profilePicture: profilePicture || undefined,
+          updatedAt: new Date()
+        }
+      },
+      { 
+        upsert: true, 
+        new: true,
+        lean: true,
+        setDefaultsOnInsert: true
       }
-    } else {
-      // Update profile picture if it changed
-      if (profilePicture && user.profilePicture !== profilePicture) {
-        user.profilePicture = profilePicture;
-        await user.save();
-      }
-    }
+    );
 
-    // Generate token
+    // Generate token immediately
     const token = generateToken(user._id);
 
     res.status(200).json({
       success: true,
-      message: user.createdAt === user.updatedAt ? 'Account created successfully' : 'Login successful',
+      message: 'Login successful',
       data: {
         token,
         user: {
@@ -253,7 +245,7 @@ router.post('/google', [
           name: user.name,
           email: user.email,
           profilePicture: user.profilePicture,
-          authProvider: user.authProvider
+          authProvider: user.authProvider || 'google'
         }
       }
     });
@@ -262,6 +254,29 @@ router.post('/google', [
     res.status(500).json({
       success: false,
       message: 'Error authenticating with Google',
+      error: error.message
+    });
+  }
+});
+
+// @route   GET /api/auth/stats
+// @desc    Get total user count (public)
+// @access  Public
+router.get('/stats', async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        totalUsers: userCount
+      }
+    });
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching stats',
       error: error.message
     });
   }

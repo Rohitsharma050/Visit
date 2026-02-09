@@ -5,11 +5,13 @@ import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import QuestionEditor from '../components/QuestionEditor';
+import { useToast } from '../context/ToastContext';
 
 const QuestionEdit = () => {
   const { id, subjectId } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!id;
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -43,7 +45,7 @@ const QuestionEdit = () => {
       setSubject(question.subjectId);
     } catch (error) {
       console.error('Error fetching question:', error);
-      alert('Error loading question');
+      toast.error('Error loading question');
     } finally {
       setLoading(false);
     }
@@ -65,17 +67,19 @@ const QuestionEdit = () => {
     try {
       if (isEditMode) {
         await api.put(`/questions/${id}`, formData);
+        toast.success('Question updated successfully!');
       } else {
         await api.post('/questions', {
           ...formData,
           subjectId: subjectId
         });
+        toast.success('Question created successfully!');
       }
       
       navigate(`/subjects/${subjectId || subject._id}`);
     } catch (error) {
       console.error('Error saving question:', error);
-      alert(error.response?.data?.message || 'Error saving question');
+      toast.error(error.response?.data?.message || 'Error saving question');
     } finally {
       setSubmitting(false);
     }

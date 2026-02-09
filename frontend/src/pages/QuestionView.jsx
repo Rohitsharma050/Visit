@@ -5,12 +5,16 @@ import { FiArrowLeft, FiEdit, FiTrash2, FiCalendar } from 'react-icons/fi';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import RichTextDisplay from '../components/RichTextDisplay';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 const QuestionView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [question, setQuestion] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   useEffect(() => {
     fetchQuestion();
@@ -28,16 +32,23 @@ const QuestionView = () => {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this question?')) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: 'Delete Question?',
+      message: 'This will permanently delete this question. This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
 
     try {
       await api.delete(`/questions/${id}`);
+      toast.success('Question deleted successfully');
       navigate(`/subjects/${question.subjectId._id}`);
     } catch (error) {
       console.error('Error deleting question:', error);
-      alert(error.response?.data?.message || 'Error deleting question');
+      toast.error(error.response?.data?.message || 'Error deleting question');
     }
   };
 
