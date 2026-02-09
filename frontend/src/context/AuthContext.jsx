@@ -12,22 +12,62 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Try to get cached user from localStorage for instant load
+  const cachedUser = (() => {
+    try {
+      const cached = localStorage.getItem('cachedUser');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const [user, setUser] = useState(cachedUser);
+  const [loading, setLoading] = useState(!!localStorage.getItem('token') && !cachedUser);
 
   useEffect(() => {
-    // Fetch user data from API if token exists
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
       
-      if (token) {
-        try {
-          const response = await api.get('/auth/me');
-          setUser(response.data.data.user);
-        } catch (error) {
-          // Token is invalid, clear it
-          localStorage.removeItem('token');
-        }
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      // If we have cached user, don't block - validate in background
+      if (cachedUser) {
+        setLoading(false);
+        // Validate token in background
+        api.get('/auth/me')
+          .then(response => {
+            const userData = response.data.data.user;
+            setUser(userData);
+            localStorage.setItem('cachedUser', JSON.stringify(userData));
+          })
+          .catch(() => {
+            // Token invalid, clear everything
+            localStorage.removeItem('token');
+            localStorage.removeItem('cachedUser');
+            setUser(null);
+          });
+        return;
+      }
+
+      // No cached user, need to fetch (with timeout)
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        
+        const response = await api.get('/auth/me', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        const userData = response.data.data.user;
+        setUser(userData);
+        localStorage.setItem('cachedUser', JSON.stringify(userData));
+      } catch (error) {
+        // Token is invalid or timeout, clear it
+        localStorage.removeItem('token');
+        localStorage.removeItem('cachedUser');
       }
       setLoading(false);
     };
@@ -41,6 +81,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data.data;
       
       localStorage.setItem('token', token);
+      localStorage.setItem('cachedUser', JSON.stringify(userData));
       setUser(userData);
       
       return { success: true };
@@ -58,6 +99,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data.data;
       
       localStorage.setItem('token', token);
+      localStorage.setItem('cachedUser', JSON.stringify(userData));
       setUser(userData);
       return { success: true };
     } catch (error) {
@@ -81,6 +123,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data.data;
       
       localStorage.setItem('token', token);
+      localStorage.setItem('cachedUser', JSON.stringify(userData));
       setUser(userData);
       
       return { success: true };
@@ -94,6 +137,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('cachedUser');
     setUser(null);
   };
 
