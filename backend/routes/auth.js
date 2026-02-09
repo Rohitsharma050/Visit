@@ -141,7 +141,9 @@ router.get('/me', protect, async (req, res) => {
         user: {
           id: req.user._id,
           name: req.user.name,
-          email: req.user.email
+          email: req.user.email,
+          profilePicture: req.user.profilePicture || null,
+          authProvider: req.user.authProvider || 'local'
         }
       }
     });
@@ -150,6 +152,116 @@ router.get('/me', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching user',
+      error: error.message
+    });
+  }
+});
+
+// @route   POST /api/auth/google
+// @desc    Authenticate or register user with Google OAuth
+// @access  Public
+router.post('/google', [
+  body('googleId').notEmpty().withMessage('Google ID is required'),
+  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('name').trim().notEmpty().withMessage('Name is required')
+], async (req, res) => {
+  try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+
+    const { googleId, email, name, profilePicture, accessToken } = req.body;
+
+    // Verify the Google access token by fetching user info
+    try {
+      const googleResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      if (!googleResponse.ok) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid Google access token'
+        });
+      }
+
+      const googleUserInfo = await googleResponse.json();
+
+      // Verify the Google ID matches
+      if (googleUserInfo.sub !== googleId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Google ID verification failed'
+        });
+      }
+    } catch (verifyError) {
+      console.error('Google token verification error:', verifyError);
+      return res.status(401).json({
+        success: false,
+        message: 'Failed to verify Google token'
+      });
+    }
+
+    // Check if user exists by googleId
+    let user = await User.findOne({ googleId });
+
+    if (!user) {
+      // Check if user exists by email (might have signed up with email/password before)
+      user = await User.findOne({ email });
+
+      if (user) {
+        // Link Google account to existing user
+        user.googleId = googleId;
+        user.profilePicture = profilePicture || user.profilePicture;
+        if (user.authProvider === 'local') {
+          // Keep as local since they originally signed up with email
+        }
+        await user.save();
+      } else {
+        // Create new user
+        user = await User.create({
+          name,
+          email,
+          googleId,
+          profilePicture,
+          authProvider: 'google'
+        });
+      }
+    } else {
+      // Update profile picture if it changed
+      if (profilePicture && user.profilePicture !== profilePicture) {
+        user.profilePicture = profilePicture;
+        await user.save();
+      }
+    }
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: user.createdAt === user.updatedAt ? 'Account created successfully' : 'Login successful',
+      data: {
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          profilePicture: user.profilePicture,
+          authProvider: user.authProvider
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error authenticating with Google',
       error: error.message
     });
   }

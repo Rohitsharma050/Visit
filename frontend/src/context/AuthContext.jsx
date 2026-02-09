@@ -68,6 +68,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const googleLogin = async (googleData) => {
+    try {
+      const response = await api.post('/auth/google', {
+        googleId: googleData.userInfo.googleId,
+        email: googleData.userInfo.email,
+        name: googleData.userInfo.name,
+        profilePicture: googleData.userInfo.profilePicture,
+        accessToken: googleData.accessToken
+      });
+      
+      const { token, user: userData } = response.data.data;
+      
+      localStorage.setItem('token', token);
+      setUser(userData);
+      
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Google login failed'
+      };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -77,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     signup,
+    googleLogin,
     logout,
     loading,
     isAuthenticated: !!user,
@@ -86,3 +111,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export default AuthContext;
+

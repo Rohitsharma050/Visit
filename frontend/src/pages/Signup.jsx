@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiLock } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const Signup = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { signup, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -31,6 +33,25 @@ const Signup = () => {
     }
     
     setLoading(false);
+  };
+
+  const handleGoogleSuccess = async (googleData) => {
+    setError('');
+    setGoogleLoading(true);
+
+    const result = await googleLogin(googleData);
+    
+    if (result.success) {
+      navigate('/dashboard');
+    } else {
+      setError(result.message);
+    }
+    
+    setGoogleLoading(false);
+  };
+
+  const handleGoogleError = (errorMessage) => {
+    setError(errorMessage);
   };
 
   return (
@@ -64,6 +85,25 @@ const Signup = () => {
               {error}
             </motion.div>
           )}
+
+          {/* Google Login Button - Above the form */}
+          <GoogleLoginButton
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            disabled={loading || googleLoading}
+          />
+
+          {/* OR Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white dark:bg-black text-gray-500 dark:text-gray-400">
+                OR
+              </span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -128,7 +168,7 @@ const Signup = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googleLoading}
               className="btn btn-primary w-full"
             >
               {loading ? 'Creating account...' : 'Sign Up'}
@@ -148,3 +188,4 @@ const Signup = () => {
 };
 
 export default Signup;
+
